@@ -1,6 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /** @format */
 
+import { Auth } from '../../common';
+
 import { useNavigate } from 'react-router-dom';
 
 import { PropTypes, React } from '../../common';
@@ -16,6 +18,7 @@ const oktaAuth = new OktaAuth(authConfig.oidc);
 
 const AuthProvider = ({ children }) => {
 	const navigate = useNavigate();
+	const { getUserInfo, getUser, silentAuth } = Auth.useAuthActions(oktaAuth);
 	const restoreOriginalUri = async (_oktaAuth, originalUri) =>
 		navigate(toRelativeUrl(originalUri || '/', window.location.origin), { replace: true });
 
@@ -25,32 +28,82 @@ const AuthProvider = ({ children }) => {
 	const [state, dispatch] = React.useReducer(AuthReducer, initialState, initializeState);
 
 	React.useLayoutEffect(() => {
+		const initAuthState = async () => {
+			let isAuthenticated = (await oktaAuth.isAuthenticated()) || false;
+
+			if (!isAuthenticated && !oktaAuth.isLoginRedirect) {
+				isAuthenticated = await silentAuth(null, { isAuthenticated, update: false });
+			}
+
+			return isAuthenticated;
+		};
 		const handler = authState => dispatch({ type: 'AUTH_STATE_UPDATED', payload: { authState } });
 
-		console.debug('AuthContext > authStateManager.subscribe()');
+		console.log('AuthContext > authStateManager.subscribe()');
 
 		oktaAuth.authStateManager.subscribe(handler);
 
-		oktaAuth.start();
+		console.log('AuthContext > initAuthState()');
+
+		initAuthState().then(() => oktaAuth.start());
 
 		return () => oktaAuth.authStateManager.unsubscribe();
 	}, []);
+
+	React.useEffect(() => {
+		console.log('state changed!');
+		const {
+			isAuthenticated,
+			isPendingLogin,
+			isPendingUserInfoFetch,
+			isPendingUserFetch,
+			isStaleUserInfo,
+			isStaleUserProfile,
+			profile,
+			userInfo,
+		} = state || {};
+
+		if (isAuthenticated && (!oktaAuth.isLoginRedirect || !isPendingLogin)) {
+			if (!isPendingUserInfoFetch) {
+				if (isStaleUserInfo || !userInfo) {
+					console.debug('Router > getUserInfo()');
+
+					getUserInfo(dispatch);
+				}
+
+				if (!isPendingUserFetch && (isStaleUserProfile || !profile)) {
+					console.debug('Router > getUser()');
+
+					getUser(dispatch, { userId: userInfo.sub });
+				}
+			}
+		}
+	}, [state]);
 
 	// eslint-disable-next-line react/jsx-no-constructed-context-values
 	const contextValues = {
 		...state,
 	};
 
+	// 1) initialize state
+	// 2) subscribe to authState
+	// 3) check if authenticated
+	// 4a) do silentAuth (if not authenticated)
+	// 5b) getUserInfo
+	// 6) getUser
+	// a) check sessionStorage first
+	// b) fetch via API
+
 	return (
-		<Security
-			oktaAuth={oktaAuth}
-			restoreOriginalUri={restoreOriginalUri}
-			onAuthRequired={customAuthHandler}
-		>
-			<AuthStateContext.Provider value={contextValues}>
+		<AuthStateContext.Provider value={contextValues}>
+			<Security
+				oktaAuth={oktaAuth}
+				restoreOriginalUri={restoreOriginalUri}
+				onAuthRequired={customAuthHandler}
+			>
 				<AuthDispatchContext.Provider value={dispatch}>{children}</AuthDispatchContext.Provider>
-			</AuthStateContext.Provider>
-		</Security>
+			</Security>
+		</AuthStateContext.Provider>
 	);
 };
 
