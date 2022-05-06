@@ -296,22 +296,6 @@ const useAuthActions = () => {
 			}
 		};
 
-		// const resetPassword = async (dispatch, { username, verificationCode }) => {
-		// 	try {
-		// 		const { status, nextStep: { inputs } } = await oktaAuth.idx.recoverPassword({ username, authenticators: ['okta_email'] });
-
-		// 		const { status, nextStep: { inputs }} = await oktaAuth.idx.proceed({ verificationCode })
-
-		// 	} catch (error) {
-		// 		if (dispatch) {
-		// 			dispatch({ type: actions.recovery.error.type, error });
-		// 		} else {
-		// 			throw new Error(error);
-		// 		}
-		// 	}
-
-		// }
-
 		const logout = (dispatch, postLogoutRedirect) => {
 			let config = {};
 
@@ -327,28 +311,6 @@ const useAuthActions = () => {
 			return oktaAuth.signOut(config).then(() => dispatch({ type: 'LOGOUT_SUCCEEDED' }));
 		};
 
-		const toggleSignUp = (dispatch, isSignUp) =>
-			dispatch({
-				type: 'LOGIN_INIT_SIGN_UP'.type,
-				payload: { isSignUp: !isSignUp },
-			});
-
-		const toggleEmailAuth = (dispatch, { isRecovery, isSignUp, isEmailAuth }) => {
-			if (isRecovery) {
-				dispatch({
-					type: 'LOGIN_INIT_WITH_EMAIL'.type,
-					payload: { isRecovery: !isRecovery, isEmailAuth: false },
-				});
-			} else if (isSignUp) {
-				dispatch({ type: 'LOGIN_INIT_SIGN_UP'.type, payload: { isEmailAuth: !isEmailAuth } });
-			} else {
-				dispatch({
-					type: 'LOGIN_INIT_WITH_EMAIL'.type,
-					payload: { isEmailAuth: !isEmailAuth },
-				});
-			}
-		};
-
 		return {
 			getUserSync,
 			getUser,
@@ -358,11 +320,8 @@ const useAuthActions = () => {
 			logout,
 			signInWithRedirect,
 			silentAuth,
-			toggleEmailAuth,
-			toggleSignUp,
 		};
 	} catch (error) {
-		// console.error(`init error [${error}]`);
 		throw new Error(`useAuthActions init error [${error}]`);
 	}
 };
