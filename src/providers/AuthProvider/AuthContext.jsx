@@ -51,7 +51,6 @@ const AuthProvider = ({ children }) => {
 	}, []);
 
 	React.useEffect(() => {
-		console.log('state changed!');
 		const {
 			isAuthenticated,
 			isPendingLogin,
@@ -71,7 +70,7 @@ const AuthProvider = ({ children }) => {
 					getUserInfo(dispatch);
 				}
 
-				if (!isPendingUserFetch && (isStaleUserProfile || !profile)) {
+				if (userInfo?.sub && !isPendingUserFetch && (isStaleUserProfile || !profile)) {
 					console.debug('Router > getUser()');
 
 					getUser(dispatch, { userId: userInfo.sub });
@@ -84,15 +83,6 @@ const AuthProvider = ({ children }) => {
 	const contextValues = {
 		...state,
 	};
-
-	// 1) initialize state
-	// 2) subscribe to authState
-	// 3) check if authenticated
-	// 4a) do silentAuth (if not authenticated)
-	// 5b) getUserInfo
-	// 6) getUser
-	// a) check sessionStorage first
-	// b) fetch via API
 
 	return (
 		<AuthStateContext.Provider value={contextValues}>

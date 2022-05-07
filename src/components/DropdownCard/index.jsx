@@ -7,17 +7,9 @@ const PROFILE_APP_URL = process.env.REACT_APP_PROFILE_URL;
 const DropdownCard = () => {
 	const dispatch = Auth.useAuthDispatch();
 	const { logout } = Auth.useAuthActions();
-	const { profile, userInfo } = Auth.useAuthState();
-
-	const picture = profile?.picture ?? userInfo?.picture;
-	const name =
-		profile?.nickName ??
-		userInfo?.nickname ??
-		profile?.firstName ??
-		userInfo?.given_name ??
-		profile?.displayName ??
-		userInfo?.name ??
-		'';
+	const {
+		profile: { nickName, firstName, displayName, picture },
+	} = Auth.useAuthState();
 
 	return (
 		<div className='dropdown-menu' id='dropdown'>
@@ -32,7 +24,7 @@ const DropdownCard = () => {
 						: {}
 				}
 			/>
-			<div className='menu__header'>{name}</div>
+			<div className='menu__header'>{nickName ?? firstName ?? displayName ?? ''}</div>
 			<ul className='menu__items'>
 				<li role='presentation'>
 					<a href={PROFILE_APP_URL} className='menu__item' role='menuitem'>
