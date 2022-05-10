@@ -1,15 +1,17 @@
-import { Auth } from '../../common';
+import { Auth, React } from '../../common';
 
 import Home from '../../components/Home';
+import PageSpinner from '../../components/PageSpinner';
 import Today from '../../components/Today';
 
 const LandingPage = () => {
-	const { isAuthenticated } = Auth.useAuthState();
+	const { _initialized, isAuthenticated, isLoading } = Auth.useAuthState();
 
 	return (
 		<>
-			{isAuthenticated && <Today />}
+			{isLoading && <PageSpinner />}
 			{!isAuthenticated && <Home />}
+			{_initialized && isAuthenticated && <Today />}
 		</>
 	);
 };

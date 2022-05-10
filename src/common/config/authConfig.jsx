@@ -21,6 +21,7 @@ export const authConfig = {
 		},
 		services: {
 			autoRenew: false,
+			syncStorage: true,
 		},
 		devMode: process.env.NODE_ENV !== 'production',
 		disableHttpsCheck: OKTA_TESTING_DISABLEHTTPSCHECK,

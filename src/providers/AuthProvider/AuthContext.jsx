@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /** @format */
 
-import { Auth } from '../../common';
+import { _, Auth } from '../../common';
 
 import { useNavigate } from 'react-router-dom';
 
@@ -29,29 +29,56 @@ const AuthProvider = ({ children }) => {
 
 	React.useLayoutEffect(() => {
 		const initAuthState = async () => {
-			let isAuthenticated = (await oktaAuth.isAuthenticated()) || false;
+			if (!oktaAuth.isLoginRedirect()) {
+				let tokens;
+				let isAuthenticated = (await oktaAuth.isAuthenticated()) || false;
 
-			if (!isAuthenticated && !oktaAuth.isLoginRedirect) {
-				isAuthenticated = await silentAuth(null, { isAuthenticated, update: false });
+				if (!isAuthenticated) {
+					return await silentAuth(null, { isAuthenticated, update: false });
+				}
+
+				try {
+					tokens = await oktaAuth.token.renewTokens();
+
+					return !_.isEmpty(tokens);
+				} catch (error) {
+					console.log('Unable to renew tokens!');
+					if (error?.errorCode === 'login_required') {
+						oktaAuth.tokenManager.clear();
+					}
+
+					return false;
+				}
 			}
-
-			return isAuthenticated;
 		};
-		const handler = authState => dispatch({ type: 'AUTH_STATE_UPDATED', payload: { authState } });
+		const handler = authState => {
+			if (state?._initialized) {
+				dispatch({ type: 'AUTH_STATE_UPDATED', payload: { authState } });
+			}
+		};
 
 		console.log('AuthContext > authStateManager.subscribe()');
-
 		oktaAuth.authStateManager.subscribe(handler);
 
 		console.log('AuthContext > initAuthState()');
 
-		initAuthState().then(() => oktaAuth.start());
+		initAuthState()
+			.then(() => oktaAuth.start())
+			.finally(() => {
+				const authState = oktaAuth.authStateManager.getAuthState();
+
+				dispatch({
+					type: 'APP_INITIALIZED',
+					payload: { isAuthenticated: authState?.isAuthenticated, authState },
+				});
+			});
 
 		return () => oktaAuth.authStateManager.unsubscribe();
 	}, []);
 
 	React.useEffect(() => {
 		const {
+			_initialized,
 			isAuthenticated,
 			isPendingLogin,
 			isPendingUserInfoFetch,
@@ -62,16 +89,16 @@ const AuthProvider = ({ children }) => {
 			userInfo,
 		} = state || {};
 
-		if (isAuthenticated && (!oktaAuth.isLoginRedirect || !isPendingLogin)) {
+		if (_initialized && isAuthenticated && (!oktaAuth.isLoginRedirect() || !isPendingLogin)) {
 			if (!isPendingUserInfoFetch) {
 				if (isStaleUserInfo || !userInfo) {
-					console.debug('Router > getUserInfo()');
+					console.debug('AuthProvider > getUserInfo()');
 
 					getUserInfo(dispatch);
 				}
 
 				if (userInfo?.sub && !isPendingUserFetch && (isStaleUserProfile || !profile)) {
-					console.debug('Router > getUser()');
+					console.debug('AuthProvider > getUser()');
 
 					getUser(dispatch, { userId: userInfo.sub });
 				}
