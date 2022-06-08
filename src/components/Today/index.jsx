@@ -4,13 +4,18 @@ import {
 	LDS,
 	getProfilePicture,
 	getUserName,
+	useUserInfoQuery,
+	useUserProfileQuery,
 	trailheadBanner,
 	trailheadBasics,
 	trailheadFirstStep,
 } from '../../common';
 
 const Today = () => {
-	const { userInfo, profile } = Auth.useAuthState();
+	const dispatch = Auth.useAuthDispatch();
+
+	const { data: userInfo } = useUserInfoQuery(dispatch);
+	const { data: profile } = useUserProfileQuery({ dispatch, userInfo });
 
 	return (
 		<div className='root'>
