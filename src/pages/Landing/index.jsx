@@ -1,17 +1,19 @@
-import { Auth, React } from '../../common';
+import { Auth, Okta, React } from '../../common';
 
 import Home from '../../components/Home';
 import PageSpinner from '../../components/PageSpinner';
 import Today from '../../components/Today';
 
 const LandingPage = () => {
-	const { _initialized, isAuthenticated, isLoading } = Auth.useAuthState();
+	const { oktaAuth } = Okta.useOktaAuth();
+
+	const { _initialized, isLoading } = Auth.useAuthState();
 
 	return (
 		<>
 			{isLoading && <PageSpinner />}
-			{!isAuthenticated && <Home />}
-			{_initialized && isAuthenticated && <Today />}
+			{!oktaAuth.isAuthenticated() && <Home />}
+			{_initialized && oktaAuth.isAuthenticated() && <Today />}
 		</>
 	);
 };
