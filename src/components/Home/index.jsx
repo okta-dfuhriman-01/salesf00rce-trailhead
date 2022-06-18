@@ -1,4 +1,4 @@
-import { React, TrailheadConnect, TrailheadEarn, TrailheadLearn } from '../../common';
+import { Icons, React } from '../../common';
 import lottie from 'lottie-web';
 
 const Home = () => {
@@ -99,7 +99,7 @@ const Home = () => {
 				</div>
 				<div className='slds-grid slds-wrap slds-text-align_center'>
 					<div className='slds-col slds-size_1-of-1 slds-medium-size_4-of-12 slds-large-size_4-of-12'>
-						<TrailheadLearn style={{ height: '65px' }} />
+						<Icons.TrailheadLearn style={{ height: '65px' }} />
 						<div className='slds-m-top_medium slds-m-bottom_x-small slds-text-heading_medium'>
 							Learn In-Demand Skills
 						</div>
@@ -109,7 +109,7 @@ const Home = () => {
 						</p>
 					</div>
 					<div className='slds-col slds-size_1-of-1 slds-medium-size_4-of-12 slds-large-size_4-of-12'>
-						<TrailheadEarn style={{ height: '65px' }} />
+						<Icons.TrailheadEarn style={{ height: '65px' }} />
 						<div className='slds-m-top_medium slds-m-bottom_x-small slds-text-heading_medium'>
 							Earn Resume-Worthy Credentials
 						</div>
@@ -119,7 +119,7 @@ const Home = () => {
 						</p>
 					</div>
 					<div className='slds-col slds-size_1-of-1 slds-medium-size_4-of-12 slds-large-size_4-of-12'>
-						<TrailheadConnect style={{ height: '65px' }} />
+						<Icons.TrailheadConnect style={{ height: '65px' }} />
 						<div className='slds-m-top_medium slds-m-bottom_x-small slds-text-heading_medium'>
 							Connect to Opportunities
 						</div>

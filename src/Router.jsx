@@ -1,32 +1,32 @@
-import { Auth } from './common';
-import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
+import { Auth, ReactRouter } from './common';
 
-import AppLoginCallback from './pages/LoginCallback';
-import TrailheadHeader from './components/TrailheadHeader';
-import PageSpinner from './components/PageSpinner';
-import SecureApp from './components/SecureApp';
+import { TrailheadHeader, SecureApp } from './components';
+import AppLoginCallback from './pages/AppLoginCallback';
+import Loading from './pages/Loading';
 import LandingPage from './pages/Landing';
 import TodayPage from './pages/Today';
 
 const Router = () => {
 	const { isLoading } = Auth.useAuthState();
 
-	const navigate = useNavigate();
+	const navigate = ReactRouter.useNavigate();
 
-	const location = useLocation();
+	const location = ReactRouter.useLocation();
 
 	const showHeader = location.pathname !== '/login/callback';
 
 	return (
 		<>
 			{showHeader && <TrailheadHeader />}
-			<Routes>
-				<Route path='/login/callback' element={<AppLoginCallback />} />
-				<Route path='/' element={<LandingPage />} />
-				<Route element={<SecureApp onAuthRequired={() => navigate('/', { replace: true })} />}>
-					<Route path='/today' element={!isLoading ? <TodayPage /> : <PageSpinner />} />
-				</Route>
-			</Routes>
+			<ReactRouter.Routes>
+				<ReactRouter.Route path='/login/callback' element={<AppLoginCallback />} />
+				<ReactRouter.Route path='/' element={<LandingPage />} />
+				<ReactRouter.Route
+					element={<SecureApp onAuthRequired={() => navigate('/', { replace: true })} />}
+				>
+					<ReactRouter.Route path='/today' element={!isLoading ? <TodayPage /> : <Loading />} />
+				</ReactRouter.Route>
+			</ReactRouter.Routes>
 		</>
 	);
 };

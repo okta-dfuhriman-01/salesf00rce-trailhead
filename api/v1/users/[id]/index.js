@@ -1,4 +1,4 @@
-import { getUnifiedProfile, updateUnifiedProfile, validateJwt } from '../../../_common';
+import { getUnifiedProfile, validateJwt } from '../../../_common';
 import { ErrorResponse } from '../../../_error';
 
 const doAuthZ = async (req, res) => {
@@ -31,29 +31,13 @@ const getUser = async (req, res) => {
 	}
 };
 
-const updateUser = async (req, res) => {
-	try {
-		// 1) Validate the accessToken
-		const accessToken = await doAuthZ(req, res);
-
-		const {
-			query: { id },
-		} = req || {};
-
-		return res.json(await updateUnifiedProfile({ accessToken, body: await req.json(), id }));
-	} catch (error) {
-		throw new Error(`updateUser(): ${error}`);
-	}
-};
-
 module.exports = async (req, res) => {
 	try {
 		const { method } = req;
 
 		switch (method) {
 			case 'POST':
-				await updateUser(req, res);
-				break;
+				return res.status(501).send();
 			case 'GET':
 			default:
 				return await getUser(req, res);

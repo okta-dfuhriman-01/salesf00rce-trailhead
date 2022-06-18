@@ -9,11 +9,20 @@ const LandingPage = () => {
 
 	const { _initialized, isLoading } = Auth.useAuthState();
 
+	const [page, setPage] = React.useState(<Home />);
+
+	React.useEffect(() => {
+		oktaAuth
+			.isAuthenticated()
+			.then(resp => (resp && _initialized ? setPage(() => <Today />) : setPage(() => <Home />)));
+	}, [_initialized, oktaAuth]);
+
 	return (
 		<>
 			{isLoading && <PageSpinner />}
-			{!oktaAuth.isAuthenticated() && <Home />}
-			{_initialized && oktaAuth.isAuthenticated() && <Today />}
+			{page}
+			{/* {!oktaAuth.isAuthenticated() && <Home />}
+			{_initialized && oktaAuth.isAuthenticated() && <Today />} */}
 		</>
 	);
 };

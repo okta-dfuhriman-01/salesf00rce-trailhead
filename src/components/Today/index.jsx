@@ -1,27 +1,15 @@
-import {
-	_,
-	Auth,
-	LDS,
-	getProfilePicture,
-	getUserName,
-	useUserInfoQuery,
-	useUserProfileQuery,
-	trailheadBanner,
-	trailheadBasics,
-	trailheadFirstStep,
-} from '../../common';
+/* eslint-disable jsx-a11y/anchor-is-valid */
+import { _, Images, LDS, Queries, Utils } from '../../common';
 
 const Today = () => {
-	const dispatch = Auth.useAuthDispatch();
-
-	const { data: userInfo } = useUserInfoQuery(dispatch);
-	const { data: profile } = useUserProfileQuery({ dispatch, userInfo });
+	const { data: userInfo } = Queries.useUserInfoQuery();
+	const { data: profile } = Queries.useUserProfileQuery({ userInfo });
 
 	return (
 		<div className='root'>
 			<div
 				className='slds-size_1-of-1 tds-bg_white th-hero--custom'
-				style={{ backgroundImage: `url(${trailheadBanner})` }}
+				style={{ backgroundImage: `url(${Images.Trailhead.Banner})` }}
 			></div>
 			<div
 				style={{
@@ -64,8 +52,8 @@ const Today = () => {
 							<circle r='13' cx='21' cy='21'></circle>
 						</clipPath>
 						<image
-							href={getProfilePicture(userInfo, profile)}
-							alt={getUserName(userInfo, profile)}
+							href={Utils.getProfilePicture(userInfo, profile)}
+							alt={Utils.getUserName(userInfo, profile)}
 							width='30'
 							height='30'
 							x='6'
@@ -76,7 +64,9 @@ const Today = () => {
 				</div>
 			</div>
 			<h1 className='tds-text-heading_neutraface-large slds-text-align_center slds-p-around--medium slds-m-bottom_medium'>
-				{!_.isEmpty(getUserName(userInfo, profile)) ? `${getUserName(userInfo, profile)}, ` : ''}
+				{!_.isEmpty(Utils.getUserName(userInfo, profile))
+					? `${Utils.getUserName(userInfo, profile)}, `
+					: ''}
 				let's learn something new today!
 			</h1>
 			<div>
@@ -90,7 +80,7 @@ const Today = () => {
 								<div>
 									<div className='th-first-step'>
 										<div className='th-first-step-image'>
-											<img alt='first-step' src={trailheadFirstStep} />
+											<img alt='first-step' src={Images.Trailhead.FirstStep} />
 											<div className='tds-dotted-trail'></div>
 										</div>
 										<div className='th-first-step-content th-first-step-content_bottom-bordered'>
@@ -115,7 +105,7 @@ const Today = () => {
 										<div className='th-first-step-image'>
 											<img
 												alt='first-step'
-												src={trailheadBasics}
+												src={Images.Trailhead.Basics}
 												className='th-first-step-image_grayscale'
 											/>
 										</div>
