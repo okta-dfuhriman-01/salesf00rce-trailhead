@@ -1,8 +1,6 @@
 import { Auth, Okta, React } from '../../common';
 
-import Home from '../../components/Home';
-import PageSpinner from '../../components/PageSpinner';
-import Today from '../../components/Today';
+import { Home, PageSpinner, Today } from '../../components';
 
 const LandingPage = () => {
 	const { oktaAuth } = Okta.useOktaAuth();
@@ -21,8 +19,6 @@ const LandingPage = () => {
 		<>
 			{isLoading && <PageSpinner />}
 			{page}
-			{/* {!oktaAuth.isAuthenticated() && <Home />}
-			{_initialized && oktaAuth.isAuthenticated() && <Today />} */}
 		</>
 	);
 };
